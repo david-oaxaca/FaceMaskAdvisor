@@ -1,0 +1,118 @@
+{% extends 'layouts/Layout_Menu.html' %}
+
+{% block body %}
+
+    <div class="d-flex" id="content-wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-container" class="bg-primary">
+            <div class="logo">
+                <h4 class="text-light font-weight-bold mb-0"><a href="MenuFaceMaskAdvisor.html" class="d-block text-light p-3 border-0">Face Mask Advisor</a></h4>
+            </div>
+            <div class="menu">
+              <p class="d-block text-light p-3 border-0"><i class="icon ion-md-finger-print lead mr-2"></i>
+                Nombre del admin</p>
+                <a href="MenuRealizarPrueba.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-pulse lead mr-2"></i>
+                    Realizar prueba</a>
+                <a href="MenuEstadisticas.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-stats lead mr-2"></i>
+                    Estadísticas</a>
+                <a href="MenuDatosDeLaCuenta.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-person lead mr-2"></i>
+                    Datos de la cuenta</a>
+                <a href="MenuAvisosRecientes.html" class="d-block text-light p-3 border-0"> <i class="icon ion-md-paper lead mr-2"></i>
+                    Avisos recientes</a>
+                    <a href="MenuAyuda.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-information-circle lead mr-2"></i>
+                      Ayuda</a>
+                      <a href="#" class="d-block text-light p-3 border-0"><i class="icon ion-md-exit lead mr-2"></i>
+                        Cerrar sesión</a>
+            </div>
+        </div>
+        <!-- Fin sidebar -->
+
+        <div class="w-100">
+
+        <!-- Page Content -->
+        <div id="content" class="bg-light w-100">
+
+              <section class="bg-light py-3">
+                  <div class="container">
+                    <div>
+                        <h1 class="font-weight-bold mb-0"><center>Datos de la cuenta</center></h1>
+                    </div>
+                  </div></br></br>
+
+                  <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="institucion" class="form-label" style="color:black;"><h3>Institución o empresa a la que pertenece:</h3></label>
+                                    <h3>{{ contact.1 }}}</h3>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="nombre" class="form-label" style="color:black;"><h3>Encargado administrativo:</h3></label>
+                                    <h3>{{ contact.3 }}}</h3>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="email" class="form-label" style="color:black;"><h3>Correo administrativo:</h3></label>
+                                    <h3>{{ contact.2 }}}</h3>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="giro" class="form-label" style="color:black;"><h3>Giro de la institución o empresa:</h3></label>
+                                    <h3>{{ contact.6 }}}</h3>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="creacion" class="form-label" style="color:black;"><h3>Creacion de la cuenta:</h3></label>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="detecciones" class="form-label" style="color:black;"><h3>Total de detecciones realizadas:</h3></label>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div>
+                                    <a href="#"><center><button type="submit" class="btn btn-primary" style="color: white; background-color: #00695C; width:350px;height:70px;"><h4>Cambiar contrasena</h4></button></center></a>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <a href="#"><center><button type="submit" class="btn btn-primary" style="color: white; background-color: #00695C; width:350px;height:70px;"><h4>Desactivar cuenta</h4></button></center></a>
+                                </div>
+                            </td>
+                        </tr>
+
+
+                    </tbody>
+                </table>  
+            </section>    
+        </div>
+    </div>        
+
+
+{% endblock %}

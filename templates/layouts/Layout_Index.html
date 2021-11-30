@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1..0">
+        <title>Face Mask Advisor</title>
+
+        <!-- Bootstrap bundle import -->
+        <script src="{{ url_for('static', filename='bootstrap.bundle.min.js') }}"></script>
+
+        <!-- Bootstrap CSS import -->
+        <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+        <link rel='stylesheet' href="{{ url_for('static', filename='css/style2.css') }}"/>
+        
+        <style>
+
+            body{
+                background-image:url(/static/img/imagenlogin.jpg);
+            }
+            .bg{
+                background-image: url(/static/img/imagenlogin.jpg);
+                background-position: center center;
+                background-size: cover;
+            }
+        </style>
+
+        <!-- JQuery CDN -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" 
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+        <!-- Main Script import -->
+        <script src="../scripts/login.js"></script>
+
+        <!-- Remove Flash Alerts Script -->
+        <script>
+            function delete_flash(flash){
+                $(flash).parent().remove()
+            }
+        </script>
+
+    </head>
+    <body>
+
+        {% block body %}
+        {% endblock %}
+
+    </body>
+</html>

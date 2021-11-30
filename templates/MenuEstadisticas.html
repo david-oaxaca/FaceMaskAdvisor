@@ -1,0 +1,187 @@
+{% extends 'layouts/Layout_Charts.html' %}
+
+{% block body %}
+    <div class="d-flex" id="content-wrapper">
+
+        <!-- Sidebar -->
+        <div id="sidebar-container" class="bg-primary">
+            <div class="logo">
+                <h4 class="text-light font-weight-bold mb-0"><a href="MenuFaceMaskAdvisor.html" class="d-block text-light p-3 border-0">Face Mask Advisor</a></h4>
+            </div>
+            <div class="menu">
+              <p class="d-block text-light p-3 border-0"><i class="icon ion-md-finger-print lead mr-2"></i>
+                Nombre del admin</p>
+                <a href="MenuRealizarPrueba.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-pulse lead mr-2"></i>
+                    Realizar prueba</a>
+                <a href="MenuEstadisticas.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-stats lead mr-2"></i>
+                    Estadísticas</a>
+                <a href="MenuDatosDeLaCuenta.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-person lead mr-2"></i>
+                    Datos de la cuenta</a>
+                <a href="MenuAvisosRecientes.html" class="d-block text-light p-3 border-0"> <i class="icon ion-md-paper lead mr-2"></i>
+                    Avisos recientes</a>
+                    <a href="MenuAyuda.html" class="d-block text-light p-3 border-0"><i class="icon ion-md-information-circle lead mr-2"></i>
+                      Ayuda</a>
+                      <a href="#" class="d-block text-light p-3 border-0"><i class="icon ion-md-exit lead mr-2"></i>
+                        Cerrar sesión</a>
+            </div>
+        </div>
+        <!-- Fin sidebar -->
+
+        <div class="w-100">
+
+        <!-- Page Content -->
+        <div id="content" class="bg-light w-100">
+
+            <section class="bg-light py-3">
+                
+                <div>
+                    <h1 class="font-weight-bold mb-0"><center>Estadisticas del uso del cubrebocas</center></h1>
+                </div>
+            
+            </section> 
+            
+            <div class="row">
+                <div style="width: 100%;">
+                    <button type="button" id="btn_volver" class="button-statistics btn btn-primary"  style="width:200px">Estadisticas diarias</button>
+                    <button type="button" id="btn_carrito" class="button-statistics btn btn-primary" style="width:200px">Estadisticas mensuales</button>
+                </div>
+                
+            </div>
+
+            <div>
+                <div>
+                   
+                    <div style="text-align: center;">
+                        <div style="padding: 20px;">
+                            <canvas id="myChart"></canvas>
+                        </div>
+    
+                        <div style="height: 50%; width: 80%; margin-left: 10%;">
+                            <canvas id="myChart_donut"></canvas>
+                        </div>
+                    </div>
+                    
+                    <script>
+                        let myChart = document.getElementById('myChart').getContext('2d');
+                        
+                        // Global Options
+                        //Chart.defaults.global.defaultFontFamily = 'Lato';
+                        //Chart.defaults.global.defaultFontSize = 18;
+                        //Chart.defaults.global.defaultFontColor = '#777';
+
+                        let barChart = new Chart(myChart, {
+                            type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
+                            data: {
+                                labels: ['14-11-2021','15-11-2021','16-11-2021','17-11-2021','18-11-2021', '19-11-2021', '20-11-2021'],
+                                datasets: [{
+                                    label: 'Uso correcto del cubrebocas',
+                                    data:[30,45,20,15,0,0,0],
+                                    backgroundColor: '#00BFA5',
+                                    hoverBorderWidth: '1',
+                                    hoverBackgroundColor: "#00796B"
+                                },
+                                {
+                                    label: 'Uso incorrecto del cubrebocas',
+                                    data:[42,25,30,5,0,0,0],
+                                    backgroundColor: '#FF9100',
+                                    hoverBorderWidth: '1',
+                                    hoverBackgroundColor: "#EF6C00"
+                                },
+                                {
+                                    label: 'No llevaba cubrebocas',
+                                    data:[20,30,22,9,0,0,0],
+                                    backgroundColor: '#FF1744',
+                                    hoverBorderWidth: '1',
+                                    hoverBackgroundColor: "#C62828"
+                                }]
+                            },
+                            options: {
+                                plugins:{
+                                    title:{
+                                        display:true,
+                                        text:'Estadisticas semanales del uso correcto del cubrebocas',
+                                        font: {
+                                            size: 25,
+                                            weight: 'bold'
+                                        }
+
+                                    },
+                                    legend:{
+                                        position:'right',
+                                        labels:{
+                                            fontColor:'#000000'
+                                        }
+                                    },
+                                    layout: {
+                                        padding: {
+                                            left: 50,
+                                            right: 0,
+                                            bottom: 0,
+                                            top: 0 
+                                        }
+                                    },
+                                    tooltips:{
+                                        enabled:true
+                                    }
+                                }
+                            }
+                        });
+
+                        let myChart_donut = document.getElementById('myChart_donut').getContext('2d');
+                        
+                        // Global Options
+                        //Chart.defaults.global.defaultFontFamily = 'Lato';
+                        //Chart.defaults.global.defaultFontSize = 18;
+                        //Chart.defaults.global.defaultFontColor = '#777';
+
+                        let donutChart = new Chart(myChart_donut, {
+                            type: 'doughnut', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
+                            data: {
+                                labels: ['Uso correcto del cubrebocas','Uso incorrecto del cubrebocas','No trae cubrebocas'],
+                                datasets: [{
+                                    data:[110,105,81],
+                                    backgroundColor: ['#00BFA5', '#FF9100', '#FF1744'],
+                                    hoverBorderWidth: '1',
+                                    hoverBackgroundColor: "#00796B"
+                                }]
+                            },
+                            options: {
+                                plugins:{
+                                    title:{
+                                        display:true,
+                                        text:'Uso del cubrebocas',
+                                        font: {
+                                            size: 25,
+                                            weight: 'bold'
+                                        }
+
+                                    },
+                                    legend:{
+                                        labels:{
+                                            fontColor:'#000000'
+                                        }
+                                    },
+                                    layout: {
+                                        padding: {
+                                            left: 50,
+                                            right: 0,
+                                            bottom: 0,
+                                            top: 0 
+                                        }
+                                    },
+                                    tooltips:{
+                                        enabled:true
+                                    }
+                                }
+                            }
+                        });
+                    </script>
+                </div>
+                <div>
+                    
+            </div>
+        </div>
+    </div>
+            
+       
+{% endblock %}

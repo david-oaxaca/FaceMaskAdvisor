@@ -1,0 +1,66 @@
+{% extends 'layouts/Layout_Index.html' %}
+
+{% block body %}
+    <div class="container w-75  mt-4 rounded shadow">
+        <div class="row align-items-stretch">
+            <div class="col bg d-none d-lg-block col-md-5 col-lg-5 col-xl-6 rounded">
+
+            </div>
+            <div class="col p-5 rounded-end"; style="background: #00796B;">
+                <div class="text-end">
+                <!-- <img src="" width="" alt=""> -->
+                </div>
+
+                <h2 class="fw-bold text-center " style="color: white;">Face Mask Advisor</h2>
+                <p class="text-justify" style="color: white;">Cree una cuenta en Face Mask Advisor para visualizar estadísticas del uso del cubrebocas en sus instalaciones y muchos beneficios más.</p>
+
+                <!--Login-->
+
+                <form action="/add_user" method="POST">
+                    <div class="mb-4">
+                        <label for="institucion" class="form-label" style="color: white;">Institución o empresa a la que pertenece:</label>
+                        <input type="text" id="institucion" class="form-control" name="institucion">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="email"  class="form-label" style="color: white;">Correo electrónico administrativo:</label>
+                        <input type="email" id="email" class="form-control" name="email">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="nombre" class="form-label" style="color: white;">Nombre del encargado:</label>
+                        <input type="text" id="nombre" class="form-control" name="nombre">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label" style="color: white;">Contraseña:</label>
+                        <input type="password" id="password"  class="form-control" name="password">
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="form-label" style="color: white;">Confirmar contraseña:</label>
+                        <input type="password" class="form-control" name="password">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="giro" class="form-label" style="color: white;">Giro de la empresa o institución:</label>
+
+                        <select name="giro" id="giro" name="select">
+                            <option value="">Seleccione el giro de la empresa</option>
+                            <option value="Industrial">Empresa de giro industrial</option>
+                            <option value="Servicios">Empresa de giro de servicios</option>
+                            <option value="Comercial">Empresa de giro comercial</option>
+                            <option value="Educativo">Institucion educativa</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" id="sign-up" name="sign-up" class="btn btn-primary" style="color: white; background-color: black; ">CREAR CUENTA</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

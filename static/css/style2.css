@@ -1,0 +1,21 @@
+table{
+    width:auto;
+    top: auto;
+    border: 5px;
+    margin: 0 auto;
+      
+}
+th{
+  color: #00796B;
+}
+
+table, th, td{
+  align-items: center;
+  align-content: center;
+}
+
+.alert {
+  width:70%;    
+  margin-left: 3%; 
+  margin-top: 1.5%;
+}
