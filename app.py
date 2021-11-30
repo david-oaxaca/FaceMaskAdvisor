@@ -26,6 +26,35 @@ def Registro():
 def Inicio():
     return render_template('MenuInicio.html')
 
+@app.route('/charts')
+def Charts():
+    return render_template('MenuEstadisticas.html')
+
+@app.route('/test')
+def Test():
+    return render_template('MenuRealizarPrueba.html')
+
+@app.route('/user_account')
+def User_account():
+    return render_template('MenuCuenta.html')
+
+@app.route('/help')
+def Account():
+    return render_template('MenuAyuda.html')
+
+@app.route('/advices')
+def Advices():
+    return render_template('MenuAvisosRecientes.html')
+
+@app.route('/add_advice')
+def Add_advice():
+    return render_template('AnadirAviso.html')
+
+@app.route('/logout')
+def Logout():
+    return 'Cerrar sesion'
+
+# Session and Queries methods
 @app.route('/login', methods=['POST'])
 def Login():
     if request.method == 'POST':
