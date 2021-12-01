@@ -13,9 +13,3 @@ table, th, td{
   align-items: center;
   align-content: center;
 }
-
-.alert {
-  width:70%;    
-  margin-left: 3%; 
-  margin-top: 1.5%;
-}

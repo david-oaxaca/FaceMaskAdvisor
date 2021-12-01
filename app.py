@@ -1,5 +1,17 @@
-from flask import Flask, render_template, request, redirect, url_for, flash;
+# Imports
+from flask import (
+    Flask, 
+    g,
+    abort,
+    render_template, 
+    request, 
+    redirect, 
+    url_for, 
+    flash, 
+    session
+ )
 from flask_mysqldb import MySQL
+from classes.User import User
 
 app = Flask(__name__)
 
@@ -11,7 +23,22 @@ app.config['MYSQL_DB'] = 'face_mask_advisor'
 mysql = MySQL(app)
 
 # Inicialización de la sesión
-app.secret_key = 'mysecretkey'
+app.secret_key = 'FaceMaskAdvisor_mysecretkey'
+
+@app.before_request
+def before_request():
+    g.user = None
+
+    if 'user_id' in session:
+        id_usuario = int(session['user_id'])
+        user_data = get_user(id_usuario)
+        user = User(user_data[0][0], user_data[0][1], user_data[0][2], user_data[0][3], user_data[0][4], user_data[0][5])
+        g.user = user
+
+@app.after_request
+def after_request(response):
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
 
 # Routing
 @app.route('/')
@@ -24,54 +51,82 @@ def Registro():
 
 @app.route('/inicio')
 def Inicio():
-    return render_template('MenuInicio.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuInicio.html')
 
 @app.route('/charts')
 def Charts():
-    return render_template('MenuEstadisticas.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuEstadisticas.html')
 
 @app.route('/test')
 def Test():
-    return render_template('MenuRealizarPrueba.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuRealizarPrueba.html')
 
 @app.route('/user_account')
 def User_account():
-    return render_template('MenuCuenta.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuCuenta.html')
 
 @app.route('/help')
 def Account():
-    return render_template('MenuAyuda.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuAyuda.html')
 
 @app.route('/advices')
 def Advices():
-    return render_template('MenuAvisosRecientes.html')
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('MenuAvisosRecientes.html')
 
 @app.route('/add_advice')
 def Add_advice():
-    return render_template('AnadirAviso.html')
-
-@app.route('/logout')
-def Logout():
-    return 'Cerrar sesion'
+    if not g.user:
+        return redirect(url_for('Index'))
+    else:
+        return render_template('AnadirAviso.html')
 
 # Session and Queries methods
 @app.route('/login', methods=['POST'])
 def Login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        cur = mysql.connection.cursor()
-        cur.execute('SELECT correo_admin, pass_admin FROM institucion WHERE correo_admin = %s', [email])
-        data = cur.fetchall()
-        #print(data)
-        if data[0][1] == password:
-            flash('Registro exitoso')
-            return redirect(url_for('Inicio'))
-        
-    flash('Registro fallido')
+        try:
+            if request.method == 'POST':
+                session.pop('user_id', None)
+                email = request.form['email']
+                password = request.form['password']
+                cur = mysql.connection.cursor()
+                cur.execute('SELECT id_institucion, correo_admin, pass_admin FROM institucion WHERE correo_admin = %s', [email])
+                data = cur.fetchall()
+                
+                if data[0][2] == password:
+                    session['user_id'] = data[0][0]
+                    flash('Registro exitoso', 'alert-success ')
+                    return redirect(url_for('Inicio'))
+                else:
+                    flash('Registro fallido', 'alert-danger')
+                    return redirect(url_for('Index'))    
+        except Exception:
+            print(Exception)
+            flash('Registro fallido', 'alert-danger')
+            return redirect(url_for('Index'))
+            
+
+@app.route('/logout')
+def Logout():
+    session.pop('user_id', None)
     return redirect(url_for('Index'))
-
-
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
@@ -92,15 +147,15 @@ def add_user():
 
         mysql.connection.commit()
 
-        flash('Cuenta dada de alta exitosamente')
+        flash('Cuenta dada de alta exitosamente', 'alert-primary')
     return redirect(url_for('Inicio'))
 
-
-@app.route('/edit_user/<id>')
 def get_user(id):
     cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM institucion WHERE id = %s', (id))
-    data = mysql.fetchall()
+    cur.execute('SELECT * FROM institucion WHERE id_institucion = %s', (id,))
+    data = cur.fetchall()
+    return data
+
 
 @app.route('/update_user/<id>', methods=['POST'])
 def update_user(id):
@@ -143,6 +198,7 @@ def delete_user(id):
     mysql.connection.commit()
     flash('Cuenta eliminada :(')
     return redirect(url_for('Index'))
+
 
 if __name__ == '__main__':
     app.run(port = 3000, debug = True)
