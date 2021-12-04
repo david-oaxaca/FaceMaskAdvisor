@@ -8,17 +8,40 @@ from flask import (
     redirect, 
     url_for, 
     flash, 
-    session
+    session,
+    jsonify
  )
 from flask_mysqldb import MySQL
 from classes.User import User
+from flask_cors import CORS
+
+import torch
+from torch import nn
+from torchvision.models import googlenet
+import numpy as np
+from torchvision.transforms import Compose, Resize, CenterCrop, ToPILImage, ToTensor
+
+import time
+from PIL import Image
+import base64
+import io
+
+model = nn.Sequential(
+    googlenet(pretrained=True),
+    nn.Linear(1000, 1),
+    nn.Sigmoid()
+)
+model.load_state_dict(torch.load('./model.pth'))
+model.eval()
 
 app = Flask(__name__)
+
+CORS(app)
 
 # Conexion a la base de datos
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'face_mask_advisor'
 mysql = MySQL(app)
 
@@ -198,6 +221,27 @@ def delete_user(id):
     mysql.connection.commit()
     flash('Cuenta eliminada :(')
     return redirect(url_for('Index'))
+
+@app.route('/clasificar', methods=['POST'])
+def clasificar():
+    start = time.time()
+    data = request.json['photo']
+    imgstr = base64.decodebytes(data.split(',')[1].encode())
+    img = Image.open(io.BytesIO(imgstr))
+    img = np.array(img)[:, :, :3]
+
+    transforms = Compose([ToPILImage(), Resize(256), CenterCrop(224), ToTensor()])
+    message = ''
+    with torch.no_grad():
+        img = transforms(img).float().unsqueeze(0)
+        pred = model.forward(img)
+        if pred.item() > 0.5:
+            message = 'Felicidades! sabes usar un cubrebocas'
+        else:
+            message = 'Lo estas usando mal >:c'
+    end = time.time()
+    print(f'{end - start} seconds')
+    return jsonify({'message': message, 'prob': pred.item()})
 
 
 if __name__ == '__main__':
