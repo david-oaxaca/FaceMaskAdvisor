@@ -1,6 +1,48 @@
 {% extends 'layouts/Layout_Charts.html' %}
 
 {% block body %}
+
+    <script>
+        $(document).ready(function(){
+            $('#weekly-stats-btn').hide();
+            $('#bar-chart-btn').hide();
+            $('#myChart_donut').hide();
+
+            $('#daily-stats-btn').click(function(){
+                $('#daily-stats-btn').hide();
+                $('#weekly-stats-btn').show();
+                $('#monthly-stats-btn').show();
+            });
+
+            $('#weekly-stats-btn').click(function(){
+                $('#daily-stats-btn').show();
+                $('#weekly-stats-btn').hide();
+                $('#monthly-stats-btn').show();
+            });
+
+            $('#monthly-stats-btn').click(function(){
+                $('#daily-stats-btn').show();
+                $('#weekly-stats-btn').show();
+                $('#monthly-stats-btn').hide();
+            });
+
+            $('#bar-chart-btn').click(function(){
+                $('#bar-chart-btn').hide();
+                $('#donut-chart-btn').show();
+                $('#myChart').show();
+                $('#myChart_donut').hide();
+            });
+
+            $('#donut-chart-btn').click(function(){
+                $('#bar-chart-btn').show();
+                $('#donut-chart-btn').hide();
+                $('#myChart').hide();
+                $('#myChart_donut').show();
+            });
+
+        });
+    </script>
+
     <div class="d-flex" id="content-wrapper">
 
         <!-- Sidebar -->
@@ -42,10 +84,12 @@
             
             <div class="row">
                 <div style="width: 100%;">
-                    <button type="button" id="btn_volver" class="button-statistics btn btn-primary"  style="width:200px">Estadisticas diarias</button>
-                    <button type="button" id="btn_carrito" class="button-statistics btn btn-primary" style="width:200px">Estadisticas mensuales</button>
+                    <button type="button" id="daily-stats-btn"  class="button-statistics btn btn-primary"  style="width:200px">Estadisticas diarias</button>
+                    <button type="button" id="weekly-stats-btn" class="button-statistics btn btn-primary"  style="width:200px;">Estadisticas semanales</button>
+                    <button type="button" id="monthly-stats-btn" class="button-statistics btn btn-primary" style="width:200px">Estadisticas mensuales</button>
+                    <button type="button" id="bar-chart-btn" class="button-statistics btn btn-primary"  style="width:200px;">Personas por fecha</button>
+                    <button type="button" id="donut-chart-btn" class="button-statistics btn btn-primary" style="width:200px">Estado del cubrebocas</button>
                 </div>
-                
             </div>
 
             <div>
@@ -56,18 +100,13 @@
                             <canvas id="myChart"></canvas>
                         </div>
     
-                        <div style="height: 50%; width: 80%; margin-left: 10%;">
+                        <div style="height: 60%; width: 75%; margin-left: 10%; text-align: center;">
                             <canvas id="myChart_donut"></canvas>
                         </div>
                     </div>
                     
                     <script>
                         let myChart = document.getElementById('myChart').getContext('2d');
-                        
-                        // Global Options
-                        //Chart.defaults.global.defaultFontFamily = 'Lato';
-                        //Chart.defaults.global.defaultFontSize = 18;
-                        //Chart.defaults.global.defaultFontColor = '#777';
 
                         let barChart = new Chart(myChart, {
                             type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
@@ -76,21 +115,21 @@
                                 datasets: [{
                                     label: 'Uso correcto del cubrebocas',
                                     data:[30,45,20,15,0,0,0],
-                                    backgroundColor: '#00BFA5',
+                                    backgroundColor: '#00796B',
                                     hoverBorderWidth: '1',
-                                    hoverBackgroundColor: "#00796B"
+                                    hoverBackgroundColor: "#00E676"
                                 },
                                 {
                                     label: 'Uso incorrecto del cubrebocas',
                                     data:[42,25,30,5,0,0,0],
-                                    backgroundColor: '#FF9100',
+                                    backgroundColor: '#00BFA5',
                                     hoverBorderWidth: '1',
                                     hoverBackgroundColor: "#EF6C00"
                                 },
                                 {
                                     label: 'No llevaba cubrebocas',
                                     data:[20,30,22,9,0,0,0],
-                                    backgroundColor: '#FF1744',
+                                    backgroundColor: '#B2DFDB',
                                     hoverBorderWidth: '1',
                                     hoverBackgroundColor: "#C62828"
                                 }]
@@ -135,16 +174,15 @@
                                 labels: ['Uso correcto del cubrebocas','Uso incorrecto del cubrebocas','No trae cubrebocas'],
                                 datasets: [{
                                     data:[110,105,81],
-                                    backgroundColor: ['#00BFA5', '#FF9100', '#FF1744'],
-                                    hoverBorderWidth: '1',
-                                    hoverBackgroundColor: "#00796B"
+                                    backgroundColor: ['#00796B', '#00BFA5', '#B2DFDB'],
+                                    hoverBackgroundColor: ['#00E676', '#EF6C00', '#C62828']
                                 }]
                             },
                             options: {
                                 plugins:{
                                     title:{
                                         display:true,
-                                        text:'Uso del cubrebocas',
+                                        text:'Estado del cubrebocas',
                                         font: {
                                             size: 25,
                                             weight: 'bold'
@@ -177,6 +215,8 @@
             </div>
         </div>
     </div>
+    
+
             
        
 {% endblock %}

@@ -3,15 +3,6 @@
 {% block body %}
     <script>
         $(document).ready(function(){
-            /*
-            $('#sign_up_id input[type="text"] input[type="password" input[type="email"]]').blur(function(){
-                if(!$(this).val()){
-                    $(this).addClass("makeRed");
-                } else{
-                    $(this).removeClass("error");
-                }
-            });
-            */
 
             $('#sign_up_id').submit(function() {
                 if ($.trim($("#institucion").val()) === "" || $.trim($("#email").val()) === ""
