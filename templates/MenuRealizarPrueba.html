@@ -37,10 +37,50 @@
                   <div class="container">
                     <div>
                         <h1 class="font-weight-bold mb-0"><center>Detección de cubrebocas</center></h1>
+                        <video autoplay id="camera" hidden></video>
+                        <canvas id="video_canvas" width="480" height="480"></canvas>
+                        <p>
+                            <span id="message"></span>: <b id="prob"></b>
+                        </p>
                       </div>
                   </div>
               </section>
         </div>
-    </div>            
+    </div>
+    <script>
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('video_canvas');
+        const message = document.getElementById('message')
+        const prob = document.getElementById('prob')
+        const ctx = canvas.getContext('2d');
+
+        const vgaConstraints = {
+            video: { width: { exact: 640 }, height: { exact: 480 } },
+        };
+        navigator.mediaDevices.getUserMedia(vgaConstraints).then((stream) => {
+            video.srcObject = stream;
+        });
+
+        let videoLoop = () => {
+            ctx.save();
+            ctx.drawImage(video, -400, -120, 1280, 720);
+            ctx.restore();
+
+            requestAnimationFrame(videoLoop);
+        }
+        videoLoop();
+
+        setInterval(() => {
+            let request = new XMLHttpRequest()
+            request.open('POST', 'http://127.0.0.1:5000/clasificar')
+            request.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+            request.send(JSON.stringify({'photo': canvas.toDataURL()}))
+            request.onreadystatechange = function() {
+                let data = JSON.parse(request.response)
+                message.innerText = data.message
+                prob.innerText = data.prob
+            }
+        }, 3000)
+    </script>         
 
 {% endblock %}
