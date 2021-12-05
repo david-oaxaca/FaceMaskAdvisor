@@ -19,19 +19,21 @@ import torch
 from torch import nn
 from torchvision.models import googlenet
 import numpy as np
-from torchvision.transforms import Compose, Resize, CenterCrop, ToPILImage, ToTensor
+from torchvision.transforms import Compose, Resize, CenterCrop, ToPILImage, ToTensor, Grayscale
 
 import time
 from PIL import Image
 import base64
 import io
 
+count = 0
+
 model = nn.Sequential(
     googlenet(pretrained=True),
     nn.Linear(1000, 1),
     nn.Sigmoid()
 )
-model.load_state_dict(torch.load('./model.pth'))
+model.load_state_dict(torch.load('./model_new.pth'))
 model.eval()
 
 app = Flask(__name__)
@@ -224,16 +226,20 @@ def delete_user(id):
 
 @app.route('/clasificar', methods=['POST'])
 def clasificar():
+    global count
+    global model
     start = time.time()
     data = request.json['photo']
     imgstr = base64.decodebytes(data.split(',')[1].encode())
-    img = Image.open(io.BytesIO(imgstr))
-    img = np.array(img)[:, :, :3]
+    img = Image.open(io.BytesIO(imgstr)).convert('RGB')
+    
+    # transforms = Compose([Grayscale(num_output_channels=3), Resize(256), CenterCrop(224)])
+    # img.save(f'test.png')
 
-    transforms = Compose([ToPILImage(), Resize(256), CenterCrop(224), ToTensor()])
+    transforms = Compose([Grayscale(num_output_channels=3), Resize(256), CenterCrop(224), ToTensor()])
     message = ''
     with torch.no_grad():
-        img = transforms(img).float().unsqueeze(0)
+        img = transforms(img).float().unsqueeze(0) * 255
         pred = model.forward(img)
         if pred.item() > 0.5:
             message = 'Felicidades! sabes usar un cubrebocas'

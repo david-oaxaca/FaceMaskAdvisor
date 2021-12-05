@@ -40,7 +40,8 @@
                         <video autoplay id="camera" hidden></video>
                         <canvas id="video_canvas" width="480" height="480"></canvas>
                         <p>
-                            <span id="message"></span>: <b id="prob"></b>
+                            <h3 id="message"></h3>
+                            <h4 id="prob"></h4>
                         </p>
                       </div>
                   </div>
@@ -54,8 +55,14 @@
         const prob = document.getElementById('prob')
         const ctx = canvas.getContext('2d');
 
+        // const supported = 'mediaDevices' in navigator;
+        // alert(`Camera is supported? ${supported}`)
+        console.log(video)
+        console.log(video.videoWidth)
+        console.log(video.videoHeight)
+
         const vgaConstraints = {
-            video: { width: { exact: 640 }, height: { exact: 480 } },
+            video: true,
         };
         navigator.mediaDevices.getUserMedia(vgaConstraints).then((stream) => {
             video.srcObject = stream;
@@ -63,7 +70,7 @@
 
         let videoLoop = () => {
             ctx.save();
-            ctx.drawImage(video, -400, -120, 1280, 720);
+            ctx.drawImage(video, -(video.videoWidth - 480)/2, -(video.videoHeight - 480)/2, video.videoWidth, video.videoHeight);
             ctx.restore();
 
             requestAnimationFrame(videoLoop);
@@ -78,9 +85,9 @@
             request.onreadystatechange = function() {
                 let data = JSON.parse(request.response)
                 message.innerText = data.message
-                prob.innerText = data.prob
+                prob.innerText = (data.prob) * 100 + '%'
             }
-        }, 3000)
+        }, 1500)
     </script>         
 
 {% endblock %}
