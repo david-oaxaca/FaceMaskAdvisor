@@ -7,6 +7,7 @@
             $('#sign_up_id').submit(function() {
                 if ($.trim($("#institucion").val()) === "" || $.trim($("#email").val()) === ""
                     || $.trim($("#nombre").val()) === ""  || $.trim($("#password").val()) === ""
+                    || $.trim($("#apellido_pat").val()) === ""  || $.trim($("#apellido_mat").val()) === ""
                     || $.trim($("#password_confirm").val()) === "" || $("#giro option:selected").val() === "") {
 
                     alert('Por favor llena todos los campos y selecciona un giro');
@@ -19,8 +20,9 @@
         });
     </script>
 
+    <div class="bg"></div>
     
-    <div class="col p-5 rounded-end data-div" >
+    <div class="col p-5 rounded-end data-div " >
         <div class="text-end">
         <!-- <img src="" width="" alt=""> -->
         </div>
@@ -44,6 +46,16 @@
             <div class="mb-4">
                 <label for="nombre" class="form-label" style="color: white;">Nombre del encargado:</label>
                 <input type="text" id="nombre" class="form-control" name="nombre">
+            </div>
+
+            <div class="mb-4">
+                <label for="nombre" class="form-label" style="color: white;">Apellido paterno del encargado:</label>
+                <input type="text" id="apellido_pat" class="form-control" name="apellido_pat">
+            </div>
+
+            <div class="mb-4">
+                <label for="nombre" class="form-label" style="color: white;">Apellido materno del encargado:</label>
+                <input type="text" id="apellido_mat" class="form-control" name="apellido_mat">
             </div>
 
             <div class="mb-4">

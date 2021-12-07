@@ -4,26 +4,190 @@
 
     <script>
         $(document).ready(function(){
+            let myChart = document.getElementById('myChart').getContext('2d');
+            let myChart_donut = document.getElementById('myChart_donut').getContext('2d');
+
+            let barChart;
+            let donutChart;
+
+            function getDay(){
+                let curr = new Date();
+                let hours = [];
+
+                for (let i = 0; i <= 23; i++) {
+                    let date = curr.getFullYear()+'-'+(curr.getMonth()+1)+'-'+curr.getDate();; 
+                    let hour = i;
+                    if (i < 10) {
+                        hour   = "0"+hour;
+                    }
+                    hours.push(hour + ":00:00");
+                }
+                return hours;
+            }
+
+            function getWeek(){
+                let curr = new Date; 
+                let week = [];
+
+                for (let i = 1; i <= 7; i++) {
+                    let first = curr.getDate() - curr.getDay() + i; 
+                    let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
+                    week.push(day);
+                }
+                return week;
+            }
+
+            function getMonth(){
+                let curr = new Date; 
+                let DaysInMonth = new Date(curr.getFullYear(), curr.getMonth() + 1, 0).getDate();
+                let month = [];
+
+                for (let i = 1; i <= DaysInMonth; i++) {
+                    let day = new Date(curr.setDate(i)).toISOString().slice(0, 10);
+                    month.push(day);
+                }
+                return month;
+            }
+
+            function graphLimits(limits){
+                let x_axis = [];
+
+                if(limits === "day"){
+                    x_axis = getDay();
+                }else if(limits === "week"){
+                    x_axis = getWeek();
+                }else if(limits === "month"){
+                    x_axis = getMonth();
+                    console.log(x_axis);
+                }
+
+                barChart = new Chart(myChart, {
+                    type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
+                    data: {
+                        labels: x_axis,
+                        datasets: [{
+                            label: 'Uso correcto del cubrebocas',
+                            data:[30,45,20,15,0,0,0],
+                            backgroundColor: '#00796B',
+                            hoverBorderWidth: '1',
+                            hoverBackgroundColor: "#00E676"
+                        },
+                        {
+                            label: 'Uso incorrecto del cubrebocas',
+                            data:[42,25,30,5,0,0,0],
+                            backgroundColor: '#00BFA5',
+                            hoverBorderWidth: '1',
+                            hoverBackgroundColor: "#EF6C00"
+                        },
+                        {
+                            label: 'No llevaba cubrebocas',
+                            data:[20,30,22,9,0,0,0],
+                            backgroundColor: '#B2DFDB',
+                            hoverBorderWidth: '1',
+                            hoverBackgroundColor: "#C62828"
+                        }]
+                    },
+                    options: {
+                        plugins:{
+                            title:{
+                                display:true,
+                                text:'Estadisticas semanales del uso correcto del cubrebocas',
+                                font: {
+                                    size: 25,
+                                    weight: 'bold'
+                                }
+
+                            },
+                            legend:{
+                                position:'right',
+                                labels:{
+                                    fontColor:'#000000'
+                                }
+                            },
+                            layout: {
+                                padding: {
+                                    left: 50,
+                                    right: 0,
+                                    bottom: 0,
+                                    top: 0 
+                                }
+                            },
+                            tooltips:{
+                                enabled:true
+                            }
+                        }
+                    }
+                });
+            }
+
+            donutChart = new Chart(myChart_donut, {
+                type: 'doughnut', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
+                data: {
+                    labels: ['Uso correcto del cubrebocas','Uso incorrecto del cubrebocas','No trae cubrebocas'],
+                    datasets: [{
+                        data:[110,105,81],
+                        backgroundColor: ['#00796B', '#00BFA5', '#B2DFDB'],
+                        hoverBackgroundColor: ['#00E676', '#EF6C00', '#C62828']
+                    }]
+                },
+                options: {
+                    plugins:{
+                        title:{
+                            display:true,
+                            text:'Estado del cubrebocas',
+                            font: {
+                                size: 25,
+                                weight: 'bold'
+                            }
+
+                        },
+                        legend:{
+                            labels:{
+                                fontColor:'#000000'
+                            }
+                        },
+                        layout: {
+                            padding: {
+                                left: 50,
+                                right: 0,
+                                bottom: 0,
+                                top: 0 
+                            }
+                        },
+                        tooltips:{
+                            enabled:true
+                        }
+                    }
+                }
+            });
+
             $('#weekly-stats-btn').hide();
             $('#bar-chart-btn').hide();
             $('#myChart_donut').hide();
+            graphLimits("week");
 
             $('#daily-stats-btn').click(function(){
+                barChart.destroy();
                 $('#daily-stats-btn').hide();
                 $('#weekly-stats-btn').show();
                 $('#monthly-stats-btn').show();
+                graphLimits("day");
             });
 
             $('#weekly-stats-btn').click(function(){
+                barChart.destroy();
                 $('#daily-stats-btn').show();
                 $('#weekly-stats-btn').hide();
                 $('#monthly-stats-btn').show();
+                graphLimits("week");
             });
 
             $('#monthly-stats-btn').click(function(){
+                barChart.destroy();
                 $('#daily-stats-btn').show();
                 $('#weekly-stats-btn').show();
                 $('#monthly-stats-btn').hide();
+                graphLimits("month");
             });
 
             $('#bar-chart-btn').click(function(){
@@ -52,7 +216,7 @@
             </div>
             <div class="menu">
               <p class="d-block text-light p-3 border-0"><i class="icon ion-md-finger-print lead mr-2"></i>
-                {{g.user.nombre}}</p>
+                {{g.user.nombre}} {{g.user.apellido_pat}}</p>
                 <a href="/test" class="d-block text-light p-3 border-0"><i class="icon ion-md-pulse lead mr-2"></i>
                     Realizar prueba</a>
                 <a href="/charts" class="d-block text-light p-3 border-0"><i class="icon ion-md-stats lead mr-2"></i>
@@ -105,110 +269,6 @@
                         </div>
                     </div>
                     
-                    <script>
-                        let myChart = document.getElementById('myChart').getContext('2d');
-
-                        let barChart = new Chart(myChart, {
-                            type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
-                            data: {
-                                labels: ['14-11-2021','15-11-2021','16-11-2021','17-11-2021','18-11-2021', '19-11-2021', '20-11-2021'],
-                                datasets: [{
-                                    label: 'Uso correcto del cubrebocas',
-                                    data:[30,45,20,15,0,0,0],
-                                    backgroundColor: '#00796B',
-                                    hoverBorderWidth: '1',
-                                    hoverBackgroundColor: "#00E676"
-                                },
-                                {
-                                    label: 'Uso incorrecto del cubrebocas',
-                                    data:[42,25,30,5,0,0,0],
-                                    backgroundColor: '#00BFA5',
-                                    hoverBorderWidth: '1',
-                                    hoverBackgroundColor: "#EF6C00"
-                                },
-                                {
-                                    label: 'No llevaba cubrebocas',
-                                    data:[20,30,22,9,0,0,0],
-                                    backgroundColor: '#B2DFDB',
-                                    hoverBorderWidth: '1',
-                                    hoverBackgroundColor: "#C62828"
-                                }]
-                            },
-                            options: {
-                                plugins:{
-                                    title:{
-                                        display:true,
-                                        text:'Estadisticas semanales del uso correcto del cubrebocas',
-                                        font: {
-                                            size: 25,
-                                            weight: 'bold'
-                                        }
-
-                                    },
-                                    legend:{
-                                        position:'right',
-                                        labels:{
-                                            fontColor:'#000000'
-                                        }
-                                    },
-                                    layout: {
-                                        padding: {
-                                            left: 50,
-                                            right: 0,
-                                            bottom: 0,
-                                            top: 0 
-                                        }
-                                    },
-                                    tooltips:{
-                                        enabled:true
-                                    }
-                                }
-                            }
-                        });
-
-                        let myChart_donut = document.getElementById('myChart_donut').getContext('2d');
-
-                        let donutChart = new Chart(myChart_donut, {
-                            type: 'doughnut', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
-                            data: {
-                                labels: ['Uso correcto del cubrebocas','Uso incorrecto del cubrebocas','No trae cubrebocas'],
-                                datasets: [{
-                                    data:[110,105,81],
-                                    backgroundColor: ['#00796B', '#00BFA5', '#B2DFDB'],
-                                    hoverBackgroundColor: ['#00E676', '#EF6C00', '#C62828']
-                                }]
-                            },
-                            options: {
-                                plugins:{
-                                    title:{
-                                        display:true,
-                                        text:'Estado del cubrebocas',
-                                        font: {
-                                            size: 25,
-                                            weight: 'bold'
-                                        }
-
-                                    },
-                                    legend:{
-                                        labels:{
-                                            fontColor:'#000000'
-                                        }
-                                    },
-                                    layout: {
-                                        padding: {
-                                            left: 50,
-                                            right: 0,
-                                            bottom: 0,
-                                            top: 0 
-                                        }
-                                    },
-                                    tooltips:{
-                                        enabled:true
-                                    }
-                                }
-                            }
-                        });
-                    </script>
                 </div>
                 <div>
                     

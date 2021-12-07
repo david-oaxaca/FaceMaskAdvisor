@@ -11,7 +11,7 @@
             </div>
             <div class="menu">
               <p class="d-block text-light p-3 border-0"><i class="icon ion-md-finger-print lead mr-2"></i>
-                {{g.user.nombre}}</p>
+                {{g.user.nombre}} {{g.user.apellido_pat}}</p>
                 <a href="/test" class="d-block text-light p-3 border-0"><i class="icon ion-md-pulse lead mr-2"></i>
                     Realizar prueba</a>
                 <a href="/charts" class="d-block text-light p-3 border-0"><i class="icon ion-md-stats lead mr-2"></i>
@@ -56,7 +56,27 @@
                             <td>
                                 <div class="mb-4">
                                     <label for="nombre" class="form-label" style="color:black;"><h3>Encargado administrativo:</h3></label>
+                                    <br />
+                                    <label for="nombre" class="form-label" style="color:black;"><h3>Nombre:</h3></label>
                                     <h3>{{ g.user.nombre }}</h3>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="apellido_pat" class="form-label" style="color:black;"><h3>Apellido Paterno:</h3></label>
+                                    <h3>{{g.user.apellido_pat}}</h3>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="mb-4">
+                                    <label for="apellido_mat" class="form-label" style="color:black;"><h3>Apellido Materno:</h3></label>
+                                    <h3>{{g.user.apellido_mat}}</h3>
                                 </div>
                             </td>
                         </tr>

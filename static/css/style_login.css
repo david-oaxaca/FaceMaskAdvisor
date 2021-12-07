@@ -1,10 +1,10 @@
-body{
-    background-image:url(/static/img/FaceMask_FlatBG.jpg);
-}
 .bg{
     background-image: url(/static/img/FaceMask_FlatBG.jpg);
     background-position: center center;
     background-size: cover;
+    position: fixed; 
+    height: 100%; 
+    width: 60%;
 }
 
 .data-div{
@@ -24,6 +24,7 @@ body{
     margin-left: 10%; 
 }
   
-.makeRed{
-    border-bottom: 1px solid red !important;
-}
+.header, .footer { overflow: hidden; position: fixed; }
+
+.page-content { overflow: auto; }
+
