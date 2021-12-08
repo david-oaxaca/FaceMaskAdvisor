@@ -1,6 +1,6 @@
 function getDay(){
     let curr = new Date();
-    let today = curr.getDate() - 1;
+    let today = curr.getDate();
     let date = new Date(curr.setDate(today)).toISOString().slice(0, 10);
     let hours = [];
 
@@ -19,9 +19,8 @@ function getWeek(){
     let curr = new Date; 
     let week = [];
 
-    for (let i = 0; i <= 6; i++) {
+    for (let i = 1; i <= 7; i++) {
         let first = curr.getDate() - curr.getDay() + i; 
-        
         let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
         week.push(day);
     }
