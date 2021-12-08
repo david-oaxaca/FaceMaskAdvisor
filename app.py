@@ -268,15 +268,15 @@ def insert_analysis(probability):
     except Exception:
         print(Exception)
 
-@app.route('/get-week-analyses', methods=['POST'])
-def get_week_analyses():
+@app.route('/get-date-analyses', methods=['POST'])
+def get_date_analyses():
     global id_inst
     data_total = [[],[],[]]
 
     if request.method == 'POST':
         inst = id_inst
         fechas = request.json
-        print(fechas)
+        # print(fechas)
 
         try:
             cur = mysql.connection.cursor()            
@@ -298,7 +298,45 @@ def get_week_analyses():
 
         except Exception:
             print(Exception) 
- 
+
+    return jsonify(data_total)
+
+
+@app.route('/get-daily-analyses', methods=['POST'])
+def get_daily_analyses():
+    global id_inst
+    data_total = [[],[],[]]
+
+    if request.method == 'POST':
+        inst = id_inst
+        fechas = request.json
+       
+        fecha_f = datetime.datetime.now()
+        fecha_f = fecha_f.replace(hour=23, minute=59, second=59)
+        fechas.append(fecha_f)
+
+        try:
+            cur = mysql.connection.cursor()            
+            for i in range(len(fechas)-1):
+                cur.execute('''
+                SELECT 
+                SUM(case when id_estado = 1 then 1 else 0 end), 
+                SUM(case when id_estado = 2 then 1 else 0 end), 
+                SUM(case when id_estado = 3 then 1 else 0 end)   
+                FROM analisis 
+                where fecha_analisis >= %s and fecha_analisis <= %s and id_institucion = %s
+                ''', 
+                (fechas[i], fechas[i+1], inst))
+
+                data = cur.fetchall()
+                data_total[0].append(data[0][0])
+                data_total[1].append(data[0][1])   
+                data_total[2].append(data[0][2])  
+          
+
+        except Exception:
+            print(Exception) 
+
     return jsonify(data_total)
 
 

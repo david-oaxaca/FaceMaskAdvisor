@@ -5,8 +5,8 @@
     <script>
 
         $(document).ready(function(){
-            let myChart = document.getElementById('myChart').getContext('2d');
-            let myChart_donut = document.getElementById('myChart_donut').getContext('2d');
+            let barCanvas = document.getElementById('barCanvas').getContext('2d');
+            let donutCanvas = document.getElementById('donutCanvas').getContext('2d');
 
             let barChart;
             let donutChart;
@@ -15,15 +15,17 @@
 
             function getDay(){
                 let curr = new Date();
+                let today = curr.getDate() - 1;
+                let date = new Date(curr.setDate(today)).toISOString().slice(0, 10);
                 let hours = [];
 
                 for (let i = 0; i <= 23; i++) {
-                    let date = curr.getFullYear()+'-'+(curr.getMonth()+1)+'-'+curr.getDate();; 
+                    
                     let hour = i;
                     if (i < 10) {
-                        hour   = "0"+hour;
+                        hour   =  "0" + hour;
                     }
-                    hours.push(hour + ":00:00");
+                    hours.push(date + " " + hour + ":00:00");
                 }
                 return hours;
             }
@@ -32,8 +34,9 @@
                 let curr = new Date; 
                 let week = [];
 
-                for (let i = 1; i <= 7; i++) {
+                for (let i = 0; i <= 6; i++) {
                     let first = curr.getDate() - curr.getDay() + i; 
+                    
                     let day = new Date(curr.setDate(first)).toISOString().slice(0, 10);
                     week.push(day);
                 }
@@ -52,10 +55,22 @@
                 return month;
             }
 
+            function sumArray(arreglo){
+                let total = 0;
+                for(let i = 0; i < arreglo.length; i++){
+                    if(arreglo[i] != null){
+                        total = total + arreglo[i];
+                    }
+                    
+                }
+
+                return total;
+            }
+
             function graphWeeklyResults(chart_type){
                 var js_data = JSON.stringify(getWeek());
                 $.ajax({                        
-                    url: '/get-week-analyses',
+                    url: '/get-date-analyses',
                     type : 'post',
                     contentType: 'application/json',
                     dataType : 'json',
@@ -65,7 +80,47 @@
                     if(chart_type === 1){
                         graphBarChart(getWeek(), result);
                     }else if(chart_type === 2){
-                        graphDonutChart([1, 1, 1]);
+                        graphDonutChart(result);
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("fail: ",textStatus, errorThrown);
+                });
+            }
+
+            function graphDailyResults(chart_type){
+                var js_data = JSON.stringify(getDay());
+                $.ajax({                        
+                    url: '/get-daily-analyses',
+                    type : 'post',
+                    contentType: 'application/json',
+                    dataType : 'json',
+                    data : js_data
+                }).done(function(result) {
+                    console.log(result);
+                    if(chart_type === 1){
+                        graphBarChart(getDay(), result);
+                    }else if(chart_type === 2){
+                        graphDonutChart(result);
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.log("fail: ",textStatus, errorThrown);
+                });
+            }
+
+            function graphMonthlyResults(chart_type){
+                var js_data = JSON.stringify(getMonth());
+                $.ajax({                        
+                    url: '/get-date-analyses',
+                    type : 'post',
+                    contentType: 'application/json',
+                    dataType : 'json',
+                    data : js_data
+                }).done(function(result) {
+                    console.log(result);
+                    if(chart_type === 1){
+                        graphBarChart(getMonth(), result);
+                    }else if(chart_type === 2){
+                        graphDonutChart(result);
                     }
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("fail: ",textStatus, errorThrown);
@@ -75,7 +130,7 @@
 
             function graphBarChart(dates, analyses_count){
 
-                barChart = new Chart(myChart, {
+                barChart = new Chart(barCanvas, {
                     type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
                     data: {
                         labels: dates,
@@ -135,12 +190,16 @@
             }
 
             function graphDonutChart(total_count){
-                donutChart = new Chart(myChart_donut, {
+                let incorrecto = sumArray(total_count[0]);
+                let parcialmente = sumArray(total_count[1]); 
+                let correcto = sumArray(total_count[2]);
+
+                donutChart = new Chart(donutCanvas, {
                     type: 'doughnut', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
                     data: {
                         labels: ['Uso correcto del cubrebocas','Uso incorrecto del cubrebocas','No trae cubrebocas'],
                         datasets: [{
-                            data:total_count,
+                            data:[correcto, parcialmente, incorrecto],
                             backgroundColor: ['#00796B', '#00BFA5', '#B2DFDB'],
                             hoverBackgroundColor: ['#00E676', '#EF6C00', '#C62828']
                         }]
@@ -180,53 +239,78 @@
 
             $('#weekly-stats-btn').hide();
             $('#bar-chart-btn').hide();
-            $('#myChart_donut').hide();
+            $('#donutCanvas').hide();
             graphWeeklyResults(1);
             graphWeeklyResults(2);
             
 
             $('#daily-stats-btn').click(function(){
-                barChart.destroy();
                 $('#daily-stats-btn').hide();
                 $('#weekly-stats-btn').show();
                 $('#monthly-stats-btn').show();
-                graphBarChart(getDay(), [[],[],[]]);
+
+                barChart.destroy();
+                graphDailyResults(1);
+                donutChart.destroy();
+                graphDailyResults(2);
+
+                if(Chart_option === 1){
+                    $('#barCanvas').show();
+                    $('#donutCanvas').hide();
+                }else if(Chart_option === 2){
+                    $('#barCanvas').hide();
+                    $('#donutCanvas').show();
+                }
             });
 
             $('#weekly-stats-btn').click(function(){
-                barChart.destroy();
                 $('#daily-stats-btn').show();
                 $('#weekly-stats-btn').hide();
                 $('#monthly-stats-btn').show();
+                barChart.destroy();
+                graphWeeklyResults(1);
+                donutChart.destroy();
+                graphWeeklyResults(2);
                 if(Chart_option === 1){
-                    graphWeeklyResults(1);
+                    $('#barCanvas').show();
+                    $('#donutCanvas').hide();
                 }else if(Chart_option === 2){
-                    graphWeeklyResults(2);
+                    $('#barCanvas').hide();
+                    $('#donutCanvas').show();
                 }
                 
             });
 
             $('#monthly-stats-btn').click(function(){
-                barChart.destroy();
                 $('#daily-stats-btn').show();
                 $('#weekly-stats-btn').show();
                 $('#monthly-stats-btn').hide();
-                graphBarChart(getMonth(), [[],[],[]]);
+                barChart.destroy();
+                graphMonthlyResults(1);
+                donutChart.destroy();
+                graphMonthlyResults(2);
+                if(Chart_option === 1){
+                    $('#barCanvas').show();
+                    $('#donutCanvas').hide();
+                }else if(Chart_option === 2){
+                    $('#barCanvas').hide();
+                    $('#donutCanvas').show();
+                }
             });
 
             $('#bar-chart-btn').click(function(){
                 $('#bar-chart-btn').hide();
                 $('#donut-chart-btn').show();
-                $('#myChart').show();
-                $('#myChart_donut').hide();
+                $('#barCanvas').show();
+                $('#donutCanvas').hide();
                 Chart_option = 1;
             });
 
             $('#donut-chart-btn').click(function(){
                 $('#bar-chart-btn').show();
                 $('#donut-chart-btn').hide();
-                $('#myChart').hide();
-                $('#myChart_donut').show();
+                $('#barCanvas').hide();
+                $('#donutCanvas').show();
                 Chart_option = 2;
             });
 
@@ -287,11 +371,11 @@
                    
                     <div style="text-align: center;">
                         <div style="padding: 20px;">
-                            <canvas id="myChart"></canvas>
+                            <canvas id="barCanvas"></canvas>
                         </div>
     
                         <div style="height: 60%; width: 75%; margin-left: 10%; text-align: center;">
-                            <canvas id="myChart_donut"></canvas>
+                            <canvas id="donutCanvas"></canvas>
                         </div>
                     </div>
                     
