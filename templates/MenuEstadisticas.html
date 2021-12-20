@@ -26,9 +26,9 @@
                 }).done(function(result) {
                     console.log(result);
                     if(chart_type === 1){
-                        graphBarChart(getWeek(), result);
+                        graphBarChart(getWeek(), result, 'Estadisticas diarias del uso de cubrebocas');
                     }else if(chart_type === 2){
-                        graphDonutChart(result);
+                        graphDonutChart(result, 'Estadisticas diarias del uso de cubrebocas');
                     }
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("fail: ",textStatus, errorThrown);
@@ -46,9 +46,9 @@
                 }).done(function(result) {
                     console.log(result);
                     if(chart_type === 1){
-                        graphBarChart(getDay(), result);
+                        graphBarChart(getDay(), result, 'Estadisticas semanales del uso de cubrebocas');
                     }else if(chart_type === 2){
-                        graphDonutChart(result);
+                        graphDonutChart(result, 'Estadisticas semanales del uso de cubrebocas');
                     }
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("fail: ",textStatus, errorThrown);
@@ -66,9 +66,9 @@
                 }).done(function(result) {
                     console.log(result);
                     if(chart_type === 1){
-                        graphBarChart(getMonth(), result);
+                        graphBarChart(getMonth(), result, 'Estadisticas mensuales del uso de cubrebocas');
                     }else if(chart_type === 2){
-                        graphDonutChart(result);
+                        graphDonutChart(result, 'Estadisticas mensuales del uso de cubrebocas');
                     }
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     console.log("fail: ",textStatus, errorThrown);
@@ -76,7 +76,7 @@
             }
 
 
-            function graphBarChart(dates, analyses_count){
+            function graphBarChart(dates, analyses_count, bar_title){
 
                 barChart = new Chart(barCanvas, {
                     type: 'bar', //Types of charts: Bar, HorizontalBar, pie, line, donut, radar, polarArea
@@ -108,7 +108,7 @@
                         plugins:{
                             title:{
                                 display:true,
-                                text:'Estadisticas semanales del uso correcto del cubrebocas',
+                                text: bar_title,
                                 font: {
                                     size: 25,
                                     weight: 'bold'
@@ -137,7 +137,7 @@
                 });
             }
 
-            function graphDonutChart(total_count){
+            function graphDonutChart(total_count, donut_title){
                 let incorrecto = sumArray(total_count[0]);
                 let parcialmente = sumArray(total_count[1]); 
                 let correcto = sumArray(total_count[2]);
@@ -156,7 +156,7 @@
                         plugins:{
                             title:{
                                 display:true,
-                                text:'Estado del cubrebocas',
+                                text: donut_title,
                                 font: {
                                     size: 25,
                                     weight: 'bold'

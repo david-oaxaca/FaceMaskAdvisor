@@ -38,4 +38,3 @@ create unique index admin_1 on institucion(correo_admin);
 alter table analisis add foreign key (id_institucion) references institucion(id_institucion);
 alter table analisis add foreign key (id_estado) references estados(id_estado);
 alter table avisos add foreign key (id_estado) references estados(id_estado);
-
