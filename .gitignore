@@ -2,3 +2,4 @@ venv
 test 
 data
 *.pyc
+Face_Mask_Advisor.sql
