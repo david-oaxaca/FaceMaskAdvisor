@@ -74,11 +74,13 @@ def before_request():
     if 'user_id' in session:
         id_usuario = int(session['user_id'])
         id_inst = id_usuario
-        #print(id_usuario)
-        user_data = get_user(id_usuario)
-        # print(user_data)
-        user = User(user_data[0][0], user_data[0][1], user_data[0][2], user_data[0][3], user_data[0][4], user_data[0][5], user_data[0][6], user_data[0][7])
-        g.user = user
+        data_count = count_users()
+        if data_count[0][0] > 0:
+            user_data = get_user(id_usuario)
+            user = User(user_data[0][0], user_data[0][1], user_data[0][2], user_data[0][3], user_data[0][4], user_data[0][5], user_data[0][6], user_data[0][7])
+            g.user = user
+        else:
+            g.user = None
 
 @app.after_request
 def after_request(response):
@@ -216,6 +218,14 @@ def get_user(id):
     except Exception as e:
         return redirect(url_for('Index'))
 
+def count_users():
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT COUNT(id_institucion) FROM institucion')
+        data = cur.fetchall()
+        return data
+    except Exception as e:
+        return redirect(url_for('Index'))
 
 @app.route('/update_user/<id>', methods=['POST'])
 def update_user(id):
