@@ -11,6 +11,7 @@ from flask import (
     session,
     jsonify
  )
+from flask_mail import Mail, Message
 from flask.json import dump
 from flask_mysqldb import MySQL
 from classes.User import User
@@ -27,6 +28,9 @@ import datetime
 from PIL import Image
 import base64
 import io
+import secrets
+
+import hashlib
 
 count = 0
 
@@ -42,9 +46,18 @@ app = Flask(__name__)
 
 CORS(app)
 
+# Parametros para el envio de correo
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = ''
+app.config['MAIL_PASSWORD'] = ''
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
 # Conexion a la base de datos
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_HOST'] = ''
+app.config['MYSQL_USER'] = ''
 app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'face_mask_advisor'
 mysql = MySQL(app)
@@ -81,6 +94,14 @@ def Index():
 @app.route('/registro')
 def Registro():
     return render_template('Registro.html')
+
+@app.route('/password_recovery')
+def Password_recovery():
+    return render_template('PasswordRecovery.html')
+
+@app.route('/password_change')
+def Password_change():
+    return render_template('PasswordChange.html')
 
 @app.route('/inicio')
 def Inicio():
@@ -138,7 +159,7 @@ def Login():
             if request.method == 'POST':
                 session.pop('user_id', None)
                 email = request.form['email']
-                password = request.form['password']
+                password = hashlib.md5(request.form['password'].encode()).hexdigest()
                 cur = mysql.connection.cursor()
                 cur.execute('SELECT id_institucion, correo_admin, pass_admin FROM institucion WHERE correo_admin = %s', [email])
                 data = cur.fetchall()
@@ -154,7 +175,6 @@ def Login():
             print(Exception)
             flash('Registro fallido', 'alert-danger')
             return redirect(url_for('Index'))
-            
 
 @app.route('/logout')
 def Logout():
@@ -171,7 +191,7 @@ def add_user():
         nombre = request.form['nombre']
         apellido_pat = request.form['apellido_pat']
         apellido_mat = request.form['apellido_mat']
-        password = request.form['password']
+        password = hashlib.md5(request.form['password'].encode()).hexdigest()
         giro = request.form['giro']
 
         cur = mysql.connection.cursor()
@@ -188,10 +208,13 @@ def add_user():
     return redirect(url_for('Inicio'))
 
 def get_user(id):
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM institucion WHERE id_institucion = %s', (id,))
-    data = cur.fetchall()
-    return data
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute('SELECT * FROM institucion WHERE id_institucion = %s', (id,))
+        data = cur.fetchall()
+        return data
+    except Exception as e:
+        return redirect(url_for('Index'))
 
 
 @app.route('/update_user/<id>', methods=['POST'])
@@ -221,7 +244,84 @@ def update_user(id):
 
     return redirect(url_for('Index'))
 
+# Password Recovery methods
+@app.route('/send_mail', methods=['POST'])
+def Send_mail():
+    try:
+        if request.method == 'POST':
+            email = request.form['email']
+            cur = mysql.connection.cursor()
+            cur.execute('SELECT id_institucion FROM institucion WHERE correo_admin = %s', [email])
+            data = cur.fetchall()
+            
+            if data[0][0] != None:
+                # We get the datestamp and the caducity for the secret key
+                secret_key = secrets.token_hex(16)
+                current_datetime = datetime.datetime.now()
+                hours = 12
+                caducity_hours = datetime.timedelta(hours = hours)
+                caducity_datetime = current_datetime + caducity_hours
 
+                cur.execute('''
+                INSERT INTO recovery_key
+                (id_institucion, secret_key, creation_date, caducity, used)
+                VALUES (%s, %s, %s, %s, %s)
+                ''', 
+                (data[0][0], secret_key, current_datetime, caducity_datetime, 0))
+                mysql.connection.commit()
+
+
+                msg = Message('Password Recovery', sender = 'FaceMaskAdvisor@gmail.com', recipients = [email])
+
+                msg.body = "Introduce la siguiente clave secreta para que puedas recuperar tu contrasseña: " + secret_key
+                mail.send(msg)
+                flash('Correo enviado', 'alert-success')
+                return redirect(url_for('Password_change')) 
+            else:
+                flash('No existe tal correo', 'alert-danger')
+                return redirect(url_for('Password_recovery'))
+    except Exception as e:
+        print(e)
+        flash('Algo salio mal', 'alert-danger')
+        return redirect(url_for('Password_recovery'))
+
+@app.route('/change_password', methods=['POST'])
+def Change_password():
+    try:
+        if request.method == 'POST':
+            secret_key = request.form['secret_key']
+            password = hashlib.md5(request.form['password'].encode()).hexdigest()
+            current_datetime = datetime.datetime.now()
+            cur = mysql.connection.cursor()
+            cur.execute('SELECT id_recovery_key, id_institucion, caducity, used FROM recovery_key WHERE secret_key = %s', [secret_key])
+            data = cur.fetchall()
+            
+            if data[0][2] > current_datetime and data[0][3] == 0:
+                cur.execute('''
+                UPDATE institucion 
+                SET pass_admin = %s
+                WHERE id_institucion = %s
+                ''', (password, data[0][1]))
+                mysql.connection.commit()
+
+                cur.execute('''
+                UPDATE recovery_key 
+                SET used = %s
+                WHERE id_recovery_key = %s
+                ''', (1, data[0][0]))
+                mysql.connection.commit()
+
+                flash('Contraseña cambiada', 'alert-success')
+                return redirect(url_for('Index')) 
+            else:
+                flash('La llave secreta ha sido usada o caduco', 'alert-danger')
+                return redirect(url_for('Password_recovery'))
+    except Exception as e:
+        print(e)
+        flash('Algo salio mal', 'alert-danger')
+        return redirect(url_for('Password_recovery'))
+
+# Account data recovery
 @app.route('/consulta', methods=['POST'])
 def read_data():
     if request.method == 'POST':
@@ -232,14 +332,7 @@ def read_data():
         print(data)
     return render_template('MenuCuenta.html', contacts = data )
 
-@app.route('/delete/<string:id>')
-def delete_user(id):
-    cur = mysql.connection.cursor()
-    cur.execute('DELETE FROM institucion WHERE id = {0}'.format(id))
-    mysql.connection.commit()
-    flash('Cuenta eliminada :(')
-    return redirect(url_for('Index'))
-
+# Image analysis and chart generation functions
 def insert_analysis(probability):
     global id_inst
 
@@ -367,7 +460,6 @@ def clasificar():
     # Guardamos la prediccion en la base de datos
     insert_analysis(pred.item())
     return jsonify({'message': message, 'prob': pred.item()})
-
 
 if __name__ == '__main__':
     app.run(port = 5000, debug = True)

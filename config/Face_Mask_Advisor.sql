@@ -34,7 +34,18 @@ CREATE TABLE estados
     estado varchar(500) not null
 );
 
+CREATE TABLE recovery_key
+(
+	id_recovery_key integer auto_increment primary key,
+    id_institucion integer not null,
+	secret_key varchar(500) not null,
+    creation_date datetime not null,
+    caducity datetime not null,
+    used integer not null
+);
+
 create unique index admin_1 on institucion(correo_admin);
 alter table analisis add foreign key (id_institucion) references institucion(id_institucion);
 alter table analisis add foreign key (id_estado) references estados(id_estado);
 alter table avisos add foreign key (id_estado) references estados(id_estado);
+alter table recovery_key add foreign key (id_institucion) references institucion(id_institucion);
